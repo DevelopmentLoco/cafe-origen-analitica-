@@ -151,3 +151,77 @@ Se probaron las funciones con el arreglo completo, un arreglo de un solo element
 **Comprobación adicional:** hay 11 ventas válidas (cantidad mayor que cero). El ticket promedio es `985.000 ÷ 11 = 89.545,45` aproximadamente.
 
 En este reto se utilizaron ciclos `for...of`, condicionales, acumuladores, un contador y comparación de máximo. No se utilizaron `map`, `filter` ni `reduce`.
+
+
+## MiniReto 3 — Del ciclo al método: rankings y agrupaciones
+
+### Indicadores reescritos con métodos de arreglos
+
+Las versiones con métodos mantienen el mismo criterio de las funciones con ciclos:
+
+- `totalVendidoM(ventas)`: transforma cada venta en su valor (`cantidad × precio`) con `map` y acumula los valores con `reduce`, iniciando en `0`.
+- `unidadesVendidasM(ventas)`: filtra las ventas cuya cantidad es mayor que `0`, transforma cada venta en su cantidad con `map` y suma las unidades con `reduce`, iniciando en `0`.
+- `ventasPorCiudadM(ventas, ciudad)`: normaliza la ciudad buscada, filtra las ventas de esa ciudad normalizando también el nombre de cada registro, transforma las ventas en su valor y suma con `reduce`, iniciando en `0`.
+
+### Agrupaciones y ranking
+
+**1. `totalPorCiudad(ventas)`**
+
+- **¿Qué recorro?** Recorro todos los registros de `ventas` con `reduce`.
+- **¿Qué filtro?** No filtro registros; todas las ventas participan en el total de su ciudad.
+- **¿Qué transformo?** Normalizo el nombre de la ciudad con `trim()` y `toLowerCase()` para usar una clave común. Conservo como nombre visible la primera forma encontrada.
+- **¿Qué acumulo?** Acumulo `cantidad × precio` para cada ciudad.
+- **¿Cómo agrupo?** Uso un objeto como diccionario, con la ciudad normalizada como clave. Después uso `Object.entries` para construir el objeto final con los nombres visibles.
+
+Resultado:
+
+| Ciudad | Total vendido |
+|---|---:|
+| Medellín | 356.000 |
+| Bogotá | 276.000 |
+| Cali | 185.000 |
+| Pereira | 168.000 |
+
+Se obtienen cuatro ciudades. Las formas `Medellín` y `medellín` se agrupan juntas; los espacios sobrantes tampoco generan otro grupo.
+
+**2. `unidadesPorProducto(ventas)`**
+
+- **¿Qué recorro?** Recorro todos los registros de ventas con `reduce`.
+- **¿Qué filtro?** No filtro registros; también se conserva el registro de cantidad cero, que aporta cero unidades.
+- **¿Qué transformo?** Tomo el nombre del producto como clave del diccionario.
+- **¿Qué acumulo?** Acumulo la cantidad de unidades de cada producto.
+- **¿Cómo agrupo?** Uso un objeto como diccionario, donde cada producto tiene la suma de sus unidades.
+
+Resultado:
+
+| Producto | Unidades |
+|---|---:|
+| Origen Huila 500 g | 7 |
+| Origen Nariño 250 g | 6 |
+| Prensa francesa | 2 |
+| Origen Sierra 500 g | 5 |
+| Molino manual | 1 |
+
+**3. `topProductosPorValor(ventas, k)`**
+
+- **¿Qué recorro?** Recorro todas las ventas con `reduce`.
+- **¿Qué filtro?** No filtro registros; cada registro aporta su valor al producto correspondiente.
+- **¿Qué transformo?** Convierto el diccionario en una lista de objetos con `Object.entries` y `map`, cada uno con `producto` y `valor`.
+- **¿Qué acumulo?** Acumulo el valor generado (`cantidad × precio`) por cada producto.
+- **¿Cómo agrupo?** Uso un objeto como diccionario, con el nombre del producto como clave. Luego copio la lista con el operador `...`, la ordeno con `sort` de mayor a menor y uso `slice` para devolver solamente los primeros `k`.
+
+Resultado de `topProductosPorValor(ventas, 3)`:
+
+| Posición | Producto | Valor generado |
+|---:|---|---:|
+| 1 | Origen Huila 500 g | 294.000 |
+| 2 | Origen Sierra 500 g | 225.000 |
+| 3 | Prensa francesa | 190.000 |
+
+La ordenación se hace sobre una copia de la lista, por lo que no modifica el arreglo original `ventas`.
+
+### Verificación ciclo / método
+
+Se ejecutó `node src/verificar.js`. El script compara las versiones con ciclo y con métodos usando el arreglo completo, un solo registro y un arreglo vacío. También comprueba la normalización de ciudades, los resultados de las agrupaciones, el top 3 y que el arreglo original conserve su orden.
+
+**Resultado:** todas las comprobaciones muestran `OK`.
