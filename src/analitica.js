@@ -169,6 +169,14 @@ function topProductosPorValor(ventas, k) {
     return productosOrdenados.slice(0, k);
 }
 
+
+// Devuelve las ventas correspondientes a una fecha exacta.
+// Si no hay ventas para esa fecha, devuelve un arreglo vacío.
+function ventasDelDia(ventas, fecha) {
+    return ventas.filter(venta => venta.fecha === fecha);
+}
+
+
 module.exports = {
     valorVenta,
     totalVendido,
@@ -181,5 +189,6 @@ module.exports = {
     ventasPorCiudadM,
     totalPorCiudad,
     unidadesPorProducto,
-    topProductosPorValor
+    topProductosPorValor,
+    ventasDelDia
 };

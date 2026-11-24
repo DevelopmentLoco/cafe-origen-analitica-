@@ -225,3 +225,46 @@ La ordenación se hace sobre una copia de la lista, por lo que no modifica el ar
 Se ejecutó `node src/verificar.js`. El script compara las versiones con ciclo y con métodos usando el arreglo completo, un solo registro y un arreglo vacío. También comprueba la normalización de ciudades, los resultados de las agrupaciones, el top 3 y que el arreglo original conserve su orden.
 
 **Resultado:** todas las comprobaciones muestran `OK`.
+
+
+## MiniReto 4 — Analítica v0.1: el primer reporte
+
+### Función `ventasDelDia(ventas, fecha)`
+
+- **¿Qué hace?** Devuelve un arreglo con los registros cuya fecha coincide exactamente con la fecha recibida.
+- **Entrada:** el arreglo de ventas y una fecha en formato `AAAA-MM-DD`.
+- **Resultado con ventas:** devuelve los registros de esa fecha.
+- **Resultado sin ventas:** devuelve `[]`. Las funciones `totalVendido`, `unidadesVendidas` y `ticketPromedio` reciben ese arreglo vacío y devuelven `0`, por lo que el reporte no genera `NaN`.
+
+### Registro de depuración 1 — Bogotá aparecía dos veces
+
+- **Síntoma:** una agrupación podía mostrar `Bogotá` y `Bogotá ` como dos ciudades diferentes.
+- **Entrada que lo produce:** dos registros de prueba con ciudades `"Bogotá"` y `"Bogotá "` respectivamente.
+- **Hipótesis:** el objeto usado como diccionario estaba utilizando el texto original como clave, sin quitar los espacios sobrantes.
+- **Prueba realizada:** se agruparon esos dos nombres con una clave sin normalizar y se obtuvieron dos claves. Después se probó la normalización con `trim()` y `toLowerCase()` y ambos nombres quedaron bajo la misma clave.
+- **Causa:** las claves de un objeto distinguen los textos exactamente; un espacio al final hace que `"Bogotá"` y `"Bogotá "` sean claves diferentes.
+- **Corrección:** `totalPorCiudad(ventas)` normaliza la ciudad con `trim()` y `toLowerCase()` antes de usarla como clave del diccionario. Así evita grupos duplicados por mayúsculas, minúsculas o espacios sobrantes.
+- **Comprobación en esta versión:** `totalPorCiudad(ventas)` devuelve cuatro grupos: Medellín, Bogotá, Cali y Pereira.
+
+### Registro de depuración 2 — El ticket promedio daba NaN en un día sin ventas
+
+- **Síntoma:** el ticket promedio mostraba `NaN` cuando se consultaba una fecha sin ventas.
+- **Entrada que lo produce:** el arreglo vacío que resulta de filtrar las ventas para la fecha `"2026-09-07"`.
+- **Hipótesis:** el cálculo estaba dividiendo el total vendido entre la cantidad de ventas sin comprobar si el divisor era cero.
+- **Prueba realizada:** con el arreglo vacío, la operación `0 / 0` produce `NaN`. Luego se ejecutó `ticketPromedio([])`, que devuelve `0` porque comprueba si hay ventas válidas antes de dividir.
+- **Causa:** se intentaba calcular un promedio sin tener registros que contar; eso produce una división entre cero.
+- **Corrección:** `ticketPromedio(ventas)` mantiene la condición que devuelve `0` cuando no hay ventas válidas. `ventasDelDia(ventas, fecha)` devuelve un arreglo vacío si no encuentra registros, y el reporte muestra los indicadores en cero junto con el mensaje `No se registraron ventas para esta fecha`.
+- **Comprobación en esta versión:** el reporte consulta `"2026-09-07"` y presenta total vendido `$ 0`, unidades `0` y ticket promedio `$ 0`, sin mostrar `NaN` ni `undefined`.
+
+### Pruebas del reporte v0.1
+
+Se ejecutó `node src/reporte.js` con los datos del proyecto. El reporte muestra:
+
+1. Resumen general.
+2. Ventas por ciudad.
+3. Unidades por producto.
+4. Top 3 de productos por valor.
+
+También se comprobó el resumen de `"2026-09-01"` (día con ventas) y `"2026-09-07"` (día sin ventas). La agrupación por ciudad contiene cuatro grupos y el reporte no presenta `NaN`, `undefined` ni ciudades duplicadas.
+
+**Resultados concretos de la reproducción:** la agrupación defectuosa de la entrada de prueba produjo `2` grupos; `totalPorCiudad` produjo `1` grupo con total `300`. Para el día sin ventas, el cálculo defectuoso produjo `NaN` y `ticketPromedio` produjo `0`.

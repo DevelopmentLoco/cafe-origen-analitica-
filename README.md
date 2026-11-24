@@ -1,6 +1,10 @@
-# Café Origen — Analítica de ventas
+# Café Origen — Motor de analítica de ventas v0.1
 
-Proyecto de exploración inicial del historial de ventas de Café Origen.
+## ¿Qué es este proyecto?
+
+Café Origen es un proyecto de JavaScript que analiza un conjunto de registros de ventas de una cafetería. El motor calcula indicadores, agrupa resultados por ciudad y producto, identifica los productos con mayor valor generado y presenta un reporte legible en la consola.
+
+Los datos originales se mantienen en `src/datos.js` sin limpieza ni modificaciones.
 
 ## Requisitos
 
@@ -14,19 +18,46 @@ cafe-origen-analitica/
 ├── src/
 │   ├── datos.js
 │   ├── analitica.js
-│   └── explorar.js
+│   ├── explorar.js
+│   ├── verificar.js
+│   └── reporte.js
 ├── bitacora.md
 └── README.md
 ```
 
-## Ejecutar la exploración
+## Cómo ejecutar el proyecto
 
-Desde la carpeta raíz del proyecto, ejecuta:
+Abre una terminal en la carpeta raíz del proyecto.
+
+**Explorar los datos originales:**
 
 ```bash
 node src/explorar.js
 ```
 
-El programa muestra la cantidad de registros, el primero y el último, el producto del elemento ubicado en el índice 4 y la tabla completa de ventas.
+**Verificar que los indicadores con ciclos y con métodos producen los mismos resultados:**
 
-Los datos originales se mantienen sin limpieza ni modificaciones.
+```bash
+node src/verificar.js
+```
+
+**Generar el reporte de negocio v0.1:**
+
+```bash
+node src/reporte.js
+```
+
+El reporte presenta el resumen general, las ventas por ciudad, las unidades por producto y el top 3 de productos por valor. También muestra el resumen de un día con ventas y de un día sin ventas.
+
+## ¿Qué preguntas responde?
+
+- ¿Cuánto dinero se vendió en total?
+- ¿Cuántas unidades se vendieron y cuál fue el ticket promedio?
+- ¿Cuál fue la venta individual de mayor valor?
+- ¿Cuánto se vendió en cada ciudad?
+- ¿Cuántas unidades se vendieron de cada producto?
+- ¿Cuáles son los tres productos que más dinero generaron?
+- ¿Cuánto se vendió en una fecha determinada?
+- ¿Qué resultado se obtiene cuando una fecha no tiene ventas?
+
+Los valores monetarios se presentan en pesos colombianos. Las ciudades se agrupan normalizando mayúsculas, minúsculas y espacios sobrantes. Cuando una fecha no tiene ventas, los indicadores numéricos devuelven cero y el reporte informa que no hubo registros.
